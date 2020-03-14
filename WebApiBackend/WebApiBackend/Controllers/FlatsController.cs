@@ -22,7 +22,8 @@ namespace WebApiBackend.Controllers
             var mapperConfigure = new MapperConfiguration(
                 config =>
                 {
-                    config.CreateMap<User, DisplayMemberDTO>();                  
+                    config.CreateMap<User, DisplayMemberDTO>();
+                    config.CreateMap<User, MemberDetailDTO>();
                 }
 
             );
@@ -44,6 +45,20 @@ namespace WebApiBackend.Controllers
             IQueryable members = _context.Entry(flat).Collection(f => f.Users).Query().OrderBy(u => u.FirstName);
             return _MemberMapper.Map<List<DisplayMemberDTO>>(members);
         }
+
+        [AllowAnonymous]
+        [HttpGet("detail/{username}")]
+        public ActionResult<MemberDetailDTO> GetMemberFullDetail(string username)
+        {
+            User member = _context.User.Find(username);
+            if (member == null)
+            {
+                return NotFound();
+            }
+
+            return _MemberMapper.Map<MemberDetailDTO>(member);
+        }
+
 
     }
 }
